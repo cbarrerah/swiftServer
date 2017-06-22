@@ -17,6 +17,58 @@ import Foundation
 // Create a new router
 let router = Router()
 
+// Function to extract the body from the received data in a kitura-request
+
+func bodyFromData(rawdata: Data?) -> JSON {
+    // var response = JSON(data: rawdata!)
+    var response = JSON("")
+
+    // guard let myData = rawdata else {
+    //     print("data not available to decode")
+    //     return [[:]]
+    // }
+    // print("Starting to process response")
+    
+    guard let rawResponse = rawdata else {
+        print("Data is empty")
+        return response
+    }
+    print("RawResponse: \(rawResponse)")
+    guard let dataString = String(data: rawResponse, encoding: String.Encoding.utf8) else {
+        print("Unable to convert to string")
+        return response
+    }
+        print("dataString: \(dataString)")
+
+    let result = dataString.range(of: "\r\n\r\n", options: NSString.CompareOptions.literal, range: dataString.startIndex..<dataString.endIndex, locale: nil)
+    // print(result)
+
+    guard let found = result else {
+        print("Unable to extract the body from the response")
+        return response
+    }
+            // print("found: \(found)")
+
+    let start = found.lowerBound
+    // print("Printing what we think is the body")
+    // print(dataString[start..<dataString.endIndex])
+    let responseBody = dataString[start..<dataString.endIndex]
+    // print("responseBody:\n\(responseBody)")
+
+
+    guard let bodyData = responseBody.data(using: .utf8) else {
+        print("unable to convert from string to data")
+        return response
+    }
+    // print("bodyData: \(bodyData)")
+
+
+    response = JSON(data:bodyData)
+    return response
+
+}
+
+
 // Handle HTTP GET requests to /
 router.get("/") {
     request, response, next in
