@@ -107,7 +107,7 @@ router.get("/") {
          }
 */
         let usableData = JSON(data:rawResponse)
-        for (i, movie):(String, JSON) in usableData {
+        for (_, movie):(String, JSON) in usableData {
         guard let movieName = movie["title"].string else { return }
             print(movieName)
         }
